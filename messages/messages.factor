@@ -10,7 +10,7 @@ IN: zeromq.messages
 : <zmq-message> ( -- msg )
     { zmq_msg_t } [ zmq_msg_init ] with-out-parameters swap (check-zmq-error) ;
 
-: >byte-array ( obj -- seq )
+: zmq_msg_t>byte-array ( obj -- seq )
     [ zmq_msg_data ] [ zmq_msg_size ] bi memory>byte-array ;
 
 PRIVATE>
@@ -23,7 +23,7 @@ PRIVATE>
 :: (with-message) ( quot message -- msg )
     message quot curry
     [ message (close-zmq-message) ] [ ] cleanup
-    message >byte-array ; inline
+    message zmq_msg_t>byte-array ; inline
 
 : with-message ( quot -- msg )
    <zmq-message> (with-message) ; inline
