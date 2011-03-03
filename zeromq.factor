@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data kernel namespaces
 fry locals io.encodings.utf8 alien.strings accessors 
-zeromq.ffi ;
+zeromq.ffi zeromq.context zeromq.sockets zeromq.messages ;
 
 IN: zeromq
 
