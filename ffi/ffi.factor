@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.libraries alien.c-types
 system combinators alien.syntax classes.struct literals math
-zeromq.constants ;
+zeromq.invariants ;
 
 IN: zeromq.ffi
 
@@ -47,19 +47,14 @@ FUNCTION: void zmq_version ( int* major, int* minor, int* patch ) ;
 #! #define EINPROGRESS (ZMQ_HAUSNUMERO + 8)
 #! #endif
 
-#! /*  Native 0MQ error codes.                                                   */
-CONSTANT: EMTHREAD $[ ZMQ_HAUSNUMERO 50 + ]
-CONSTANT: EFSM $[ ZMQ_HAUSNUMERO 51 + ]
-CONSTANT: ENOCOMPATPROTO $[ ZMQ_HAUSNUMERO 52 + ]
-CONSTANT: ETERM $[ ZMQ_HAUSNUMERO 53 + ]
+#! /*  Native 0MQ error codes.                                            */
+ENUM: zmq_error_t
+{ EMTHREAD $[ ZMQ_HAUSNUMERO 50 + ] }
+{ EFSM $[ ZMQ_HAUSNUMERO 51 + ] }
+{ ENOCOMPATPROTO $[ ZMQ_HAUSNUMERO 52 + ] }
+{ ETERM $[ ZMQ_HAUSNUMERO 53 + ] } ;
 
-#! /*  This function retrieves the errno as it is known to 0MQ library. The goal */
-#! /*  of this function is to make the code 100% portable, including where 0MQ   */
-#! /*  compiled with certain CRT library (on Windows) is linked to an            */
-#! /*  application that uses different CRT library.                              */
 FUNCTION: int zmq_errno ( ) ;
-
-#! /*  Resolves system errors and 0MQ errors to human-readable string.           */
 FUNCTION: char* zmq_strerror ( int errnum ) ;
 
 
@@ -90,45 +85,24 @@ FUNCTION: size_t zmq_msg_size ( zmq_msg_t *msg ) ;
 FUNCTION: void *zmq_init ( int io_threads ) ;
 FUNCTION: int zmq_term ( void *context ) ;
 
-#! /*  Socket types.                                                             */ 
-CONSTANT: ZMQ_PAIR 0
-CONSTANT: ZMQ_PUB 1
-CONSTANT: ZMQ_SUB 2
-CONSTANT: ZMQ_REQ 3
-CONSTANT: ZMQ_REP 4
-CONSTANT: ZMQ_XREQ 5
-CONSTANT: ZMQ_XREP 6
-CONSTANT: ZMQ_PULL 7
-CONSTANT: ZMQ_PUSH 8
-ALIAS: ZMQ_UPSTREAM ZMQ_PULL    #!   /*  Old alias, remove in 3.x               */
-ALIAS: ZMQ_DOWNSTREAM ZMQ_PUSH  #!   /*  Old alias, remove in 3.x               */
+ENUM: zmq_socket_t { ZMQ_PAIR 0 } { ZMQ_PUB 1  } { ZMQ_SUB 2  } { ZMQ_REQ 3  }
+    { ZMQ_REP 4  } { ZMQ_XREQ 5 } { ZMQ_XREP 6 } { ZMQ_PULL 7 } { ZMQ_PUSH 8 }
+    { ZMQ_UPSTREAM 7 } { ZMQ_DOWNSTREAM 8 } ;
 
-#! /*  Socket options.                                                           */
-CONSTANT: ZMQ_HWM 1
-CONSTANT: ZMQ_SWAP 3
-CONSTANT: ZMQ_AFFINITY 4
-CONSTANT: ZMQ_IDENTITY 5
-CONSTANT: ZMQ_SUBSCRIBE 6
-CONSTANT: ZMQ_UNSUBSCRIBE 7
-CONSTANT: ZMQ_RATE 8
-CONSTANT: ZMQ_RECOVERY_IVL 9
-CONSTANT: ZMQ_MCAST_LOOP 10
-CONSTANT: ZMQ_SNDBUF 11
-CONSTANT: ZMQ_RCVBUF 12
-CONSTANT: ZMQ_RCVMORE 13
+ENUM: zmq_sockopt_t { ZMQ_HWM 1 } { ZMQ_SWAP 3 } { ZMQ_AFFINITY 4 }
+    { ZMQ_IDENTITY 5 } { ZMQ_SUBSCRIBE 6 } { ZMQ_UNSUBSCRIBE 7 } { ZMQ_RATE 8 }
+    { ZMQ_RECOVERY_IVL 9 } { ZMQ_MCAST_LOOP 10 } { ZMQ_SNDBUF 11 }
+    { ZMQ_RCVBUF 12 } { ZMQ_RCVMORE 13 } ;
 
 #! /*  Send/recv options.                                                        */
 CONSTANT: ZMQ_NOBLOCK 1
 CONSTANT: ZMQ_SNDMORE 2
 
-FUNCTION: void *zmq_socket ( void *context, int type ) ;
+FUNCTION: void *zmq_socket ( void *context, zmq_socket_t type ) ;
 FUNCTION: int zmq_close ( void *s ) ;
-#! FUNCTION: int zmq_setsockopt ( void *s, int option, const void *optval, size_t optvallen ) ; 
-FUNCTION: int zmq_setsockopt ( void *s, int option, void *optval, size_t optvallen ) ; 
-FUNCTION: int zmq_getsockopt ( void *s, int option, void *optval, size_t *optvallen ) ;
-#! FUNCTION: int zmq_bind ( void *s, const char *addr ) ;
+FUNCTION: int zmq_setsockopt ( void *s, zmq_sockopt_t option, void *optval, size_t optvallen ) ; 
+FUNCTION: int zmq_getsockopt ( void *s, zmq_sockopt_t option, void *optval, size_t *optvallen ) ;
 FUNCTION: int zmq_bind ( void *s, c-string addr ) ;
-#! FUNCTION: int zmq_connect ( void *s, const char *addr ) ;
 FUNCTION: int zmq_connect ( void *s, c-string addr ) ;
 FUNCTION: int zmq_send ( void *s, zmq_msg_t *msg, int flags ) ;
 FUNCTION: int zmq_recv ( void *s, zmq_msg_t *msg, int flags ) ;
@@ -149,8 +123,9 @@ FUNCTION: int zmq_poll ( zmq_pollitem_t *items, int nitems, long timeout ) ;
 #! /*  Devices - Experimental.                                                   */
 #! /******************************************************************************/
 
-CONSTANT: ZMQ_STREAMER 1
-CONSTANT: ZMQ_FORWARDER 2
-CONSTANT: ZMQ_QUEUE 3
+ENUM: zmq_device_t
+{ ZMQ_STREAMER 1 }
+{ ZMQ_FORWARDER 2 }
+{ ZMQ_QUEUE 3 } ;
 
-FUNCTION: int zmq_device ( int device, void* insocket, void* outsocket ) ;
+FUNCTION: int zmq_device ( zmq_device_t device, void* insocket, void* outsocket ) ;
