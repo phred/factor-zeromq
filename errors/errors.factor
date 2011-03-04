@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data kernel namespaces
 fry locals io.encodings.utf8 alien.strings accessors 
-continuations zeromq.ffi ;
+continuations zeromq.ffi math ;
 
 IN: zeromq.errors
 
@@ -10,5 +10,5 @@ IN: zeromq.errors
     zmq_errno zmq_strerror utf8 alien>string ;
 
 : (check-zmq-error) ( retval -- )
-    0 = [ (zmq-err-message) throw ] unless ;
+    [ (zmq-err-message) throw ] unless-zero ;
 
