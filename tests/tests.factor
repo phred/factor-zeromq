@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Fred Alger.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data calendar io kernel math threads
-zeromq zeromq.context zeromq.ffi zeromq.sockets strings ;
+zeromq zeromq.ffi zeromq.sockets strings ;
 
 IN: zeromq.tests
 
@@ -22,3 +22,4 @@ IN: zeromq.tests
           10 [ recv >string print ] times
         ] with-socket
       ] with-zmq-context drop ;
+

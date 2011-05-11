@@ -8,7 +8,8 @@ IN: zeromq.messages
 
 <PRIVATE
 : zmq_msg_t>byte-array ( obj -- seq )
-    [ zmq_msg_data ] [ zmq_msg_size ] bi memory>byte-array ;
+    [ zmq_msg_data ] [ zmq_msg_size ] bi
+    dup 0 = [ 2drop B{ } ] [ memory>byte-array ] if ;
 
 PRIVATE>
 
@@ -28,8 +29,8 @@ PRIVATE>
 
 :: (with-message) ( quot msg -- msg' )
     msg quot curry
-    [ msg (close-zmq-message) ] [ ] cleanup
-    msg zmq_msg_t>byte-array ; inline
+    [ msg [ zmq_msg_t>byte-array ] [ (close-zmq-message) ] bi ]
+    [ ] cleanup ; inline
 
 : with-new-message ( quot -- msg )
    <zmq-blank-message> (with-message) ; inline
